@@ -58,13 +58,15 @@ public:
     if (root == nullptr)
       return 0;
 
-//    if (!root->left && !root->right)
-//      return 1;
+    if (!root->left && !root->right)
+      return 1;
 
-    int left = minDepth(root->left);
-    int right = minDepth(root->right);
-
-    return std::min(left, right) + 1;
+    int ret = INT_MAX;
+    if(root->left != NULL)
+      ret = min(ret, 1 + minDepth(root->left));
+    if(root->right != NULL)
+      ret = min(ret, 1 + minDepth(root->right));
+    return ret;
   }
 
 

@@ -57,65 +57,18 @@ void Print(TreeNode* p) {
 class Solution {
 public:
   bool isBalanced(TreeNode* root) {
-    if (root == nullptr)
-      return true;
-    return (std::abs(height(root->left) - height(root->right)) <= 1) && isBalanced(root->left) && isBalanced(root->right);
+      if (root == nullptr)
+          return true;
+      return std::abs(Height(root->left, 1) - Height(root->right, 1)) <= 1 && isBalanced(root->left) && isBalanced(root->right);
   }
 
-  int height(TreeNode *root)
-  {
-    if (root == nullptr)
-      return 0;
-    int left = height(root->left);
-    int right = height(root->right);
-    return std::max(left, right) + 1;
-  }
-
-  bool isBalanced2(TreeNode* root) {
-    if (root == nullptr)
-      return true;
-    queue<TreeNode *> q;
-    q.push(root);
-
-    unordered_map<TreeNode*, int> hash;
-
-    while (!q.empty()) {
-      TreeNode *node = q.front();
-      q.pop();
-
-      int left = 0;
-      if (node->left) {
-        if (hash.count(node->left))
-          left = hash[node->left];
-        else {
-          left = height(node->left);
-          hash[node->left] = left;
-        }
-      }else {
-        left = 0;
+  int Height(TreeNode *root, int level) {
+      if (root == nullptr) {
+          //std::cout << "level : " << level << ": null" << std::endl;
+          return 0;
       }
-
-      int right = 0;
-      if (node->right) {
-        if (hash.count(node->right))
-          right = hash[node->right];
-        else {
-          right = height(node->right);
-          hash[node->right] = right;
-        }
-      }else {
-        right = 0;
-      }
-
-      if (abs(left - right) > 1)
-        return false;
-
-      if (node->left)
-        q.push(node->left);
-      if (node->right)
-        q.push(node->right);
-    }
-    return true;
+      //std::cout << "levle: " << level << ": " << root->val << std::endl;
+      return std::max(Height(root->left, level + 1), Height(root->right, level + 1)) + 1;
   }
 };
 
@@ -142,6 +95,6 @@ int main()
   std::cout << std::endl;
 
 
-  std::cout << Solution().isBalanced2(root) << std::endl;
+  std::cout << Solution().isBalanced(root) << std::endl;
   return 0;
 }

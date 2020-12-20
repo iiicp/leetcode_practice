@@ -13,6 +13,7 @@
 #include <queue>
 #include <string>
 #include <unordered_map>
+#include <string>
 
 using namespace std;
 
@@ -56,40 +57,32 @@ void Print(TreeNode* p) {
 
 class Solution {
 public:
-  /// 每遍历一个就减去结点的值
-  bool hasPathSum(TreeNode* root, int sum) {
-      if (root == nullptr)
-          return false;
-      if (!root->left && !root->right && root->val == sum)
-          return true;
-      return hasPathSum(root->left, sum-root->val) || hasPathSum(root->right, sum-root->val);
-  }
-
-  bool hasPathSum2(TreeNode *root, int sum) {
-    if (root == nullptr)
-      return false;
-
-    stack<pair<TreeNode*, int>> s;
-    s.push(make_pair(root, sum));
-
-    while (!s.empty()) {
-      TreeNode *node = s.top().first;
-      int num = s.top().second;
-      s.pop();
-
-//      std::cout << "< " << node->val << ", " << num << " >" << std::endl;
-
-      if (node->val == num && !node->left && !node->right)
-        return true;
-
-      if (node->left)
-        s.push(make_pair(node->left, num-node->val));
-      if (node->right)
-        s.push(make_pair(node->right, num-node->val));
+    vector<string> binaryTreePaths(TreeNode* root) {
+        vector<string> res;
+        findPath(res, "", root, 0);
+        return res;
     }
 
-    return false;
-  }
+    void findPath(vector<string>& res,  string path, TreeNode *root, int level) {
+        if (root == nullptr)
+            return;
+
+        if (!root->left && !root->right) {
+            if (level == 0) {
+                res.push_back(path + to_string(root->val));
+            }else{
+                res.push_back(path + "->" + to_string(root->val));
+            }
+        }else {
+            if (level == 0) {
+                findPath(res, path + to_string(root->val), root->left, level + 1);
+                findPath(res, path + to_string(root->val), root->right, level + 1);
+            }else {
+                findPath(res, path + "->" + to_string(root->val), root->left, level + 1);
+                findPath(res, path + "->" + to_string(root->val), root->right, level + 1);
+            }
+        }
+    }
 };
 
 int main()
@@ -118,6 +111,9 @@ int main()
   std::cout << std::endl;
 
 
-  std::cout << Solution().hasPathSum(root, 22) << std::endl;
+  vector<string> res = Solution().binaryTreePaths(root);
+  for (auto &str : res) {
+      std::cout  << str << std::endl;
+  }
   return 0;
 }

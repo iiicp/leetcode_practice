@@ -16,12 +16,6 @@
 
 using namespace std;
 
-#include <iostream>
-#include <vector>
-#include <stack>
-
-using namespace std;
-
 struct TreeNode {
      int val;
      TreeNode *left;
@@ -55,44 +49,59 @@ TreeNode *create_tree(int *arr, int len) {
 void Print(TreeNode* p) {
   if (NULL == p)
     return;
-  cout << p->val << ", ";
+  cout << p->val;
   Print(p->left);
   Print(p->right);
 }
 
 class Solution {
-    class STNode {
-    public:
-        STNode *prev;
-        TreeNode *cur;
-        int sum;
-        STNode() : prev(nullptr), cur(nullptr), sum(0) {}
-        STNode(STNode* prev, TreeNode *cur, int sum):  prev(prev), cur(cur), sum(sum) {}
-    };
-    void findPath(vector<vector<int>> &res, vector<int> &path, TreeNode *root, int tsum, int sum) {
-        if (root == nullptr)
-            return;
-        tsum += root->val;
-        path.push_back(root->val);
-        if (!root->left && !root->right && tsum == sum) {
-            res.push_back(path);
-        }else {
-            findPath(res, path, root->left, tsum, sum);
-            findPath(res, path, root->right,tsum, sum);
-        }
-        path.pop_back();
-        tsum -= root->val;
-    }
 public:
-  vector<vector<int>> pathSum(TreeNode* root, int sum) {
-    vector<vector<int>> res;
-    if (root == nullptr)
-        return res;
+    bool isValidBST(TreeNode* root) {
+        if (root == nullptr)
+            return true;
 
-    vector<int> path;
-    findPath(res, path, root, 0, sum);
-    return res;
-  }
+        if (!root->left && !root->right) {
+            return true;
+        }
+
+        long leftMax = findMaxValue(root->left);
+        long rightMin = findMinValue(root->right);
+        std::cout << "( " << leftMax << ", " << rightMin << " )" << std::endl;
+        return leftMax < root->val && rightMin > root->val
+        && isValidBST(root->left) && isValidBST(root->right);
+    }
+
+    long findMaxValue(TreeNode *root) {
+        if (root == nullptr)
+            return LONG_MIN;
+        long leftMax = findMaxValue(root->left);
+        long rightMax = findMaxValue(root->right);
+        long maxValue;
+        if (leftMax > rightMax) {
+            maxValue = leftMax;
+        }else {
+            maxValue = rightMax;
+        }
+        if (maxValue < root->val)
+            maxValue = root->val;
+        return maxValue;
+    }
+
+    long findMinValue(TreeNode *root) {
+        if (root == nullptr)
+            return LONG_MAX;
+        long leftMin = findMinValue(root->left);
+        long rightMin = findMinValue(root->right);
+        long minValue;
+        if (leftMin < rightMin) {
+            minValue = leftMin;
+        }else {
+            minValue = rightMin;
+        }
+        if (minValue > root->val)
+            minValue = root->val;
+        return minValue;
+    }
 };
 
 int main()
@@ -102,13 +111,13 @@ int main()
  *          /                 \
  *        4                    8
  *       /  \                 /  \
- *      11   null           13   4
- *    7   2  null null     null null null 1
+ *      2   null           6   9
+ *    1   3  null null     null null null 10
  */
 
   // [5,4,8,11,null,13,4,7,2,null,null,null,1]
   // 22
-  int arr[] = { 5,4,8,11,-1,13,4, 7,2,-1,-1,-1,-1,-1,1};
+  int arr[] = { 5,4,8,2,-1,6,9, 1,3,-1,-1,-1,-1,-1,10};
   int n = sizeof(arr)/sizeof(int);
   TreeNode *root = create_tree(arr, n);
   Print(root);
@@ -120,13 +129,7 @@ int main()
 //  Print(root1);
 //  std::cout << std::endl;
 
+  std::cout << Solution().isValidBST(root) << std::endl;
 
-  vector<vector<int>> res = Solution().pathSum(root,22);
-  for (auto &v : res) {
-    for (auto &n : v) {
-      std::cout << n << ", ";
-    }
-    std::cout << std::endl;
-  }
   return 0;
 }

@@ -59,43 +59,16 @@ public:
   int sumOfLeftLeaves(TreeNode* root) {
     if (root == nullptr)
       return 0;
-
-    queue<pair<TreeNode*, bool>> q;
-    q.push(make_pair(root, false));
-    int sum = 0;
-    while (!q.empty()) {
-      TreeNode *node = q.front().first;
-      bool isLeft = q.front().second;
-      q.pop();
-
-      if (isLeft && !node->left && !node->right)
-        sum += node->val;
-
-      if (node->left)
-        q.push(make_pair(node->left, true));
-      if (node->right)
-        q.push(make_pair(node->right, false));
-    }
-
-    return sum;
-  }
-
-  int sumOfLeftLeaves2(TreeNode* root) {
-    if (root == nullptr)
-      return 0;
-
     return _sumOfLeftLeaves(root, false);
   }
 
   int _sumOfLeftLeaves(TreeNode* root, bool isLeft) {
-    if (root == nullptr)
-      return 0;
-
-    if (!root->left && !root->right && isLeft)
-      return root->val;
-
-    return _sumOfLeftLeaves(root->left, true) +
-           _sumOfLeftLeaves(root->right, false);
+      if (root == nullptr)
+          return 0;
+      if (!root->left && !root->right && isLeft)
+          return root->val;
+      return _sumOfLeftLeaves(root->left, true) +
+      _sumOfLeftLeaves(root->right, false);
   }
 };
 
@@ -126,7 +99,6 @@ int main()
 
   std::cout << Solution().sumOfLeftLeaves(root) << std::endl;
 
-  std::cout << Solution().sumOfLeftLeaves2(root) << std::endl;
 
   return 0;
 }

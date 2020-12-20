@@ -37,7 +37,7 @@ struct TreeNode {
 */
 void _recurseve(TreeNode* &root, int *arr, int len, int index) {
 
-  if (index >= len || arr[index] == -1) {
+  if (index >= len || arr[index] == -100) {
     return;
   }
   // -1 mean null node
@@ -69,46 +69,80 @@ class Solution {
         STNode() : prev(nullptr), cur(nullptr), sum(0) {}
         STNode(STNode* prev, TreeNode *cur, int sum):  prev(prev), cur(cur), sum(sum) {}
     };
-    void findPath(vector<vector<int>> &res, vector<int> &path, TreeNode *root, int tsum, int sum) {
+    void findPath(vector<vector<int>> &res, vector<int> &path, TreeNode *root, int sum) {
         if (root == nullptr)
             return;
-        tsum += root->val;
-        path.push_back(root->val);
-        if (!root->left && !root->right && tsum == sum) {
-            res.push_back(path);
-        }else {
-            findPath(res, path, root->left, tsum, sum);
-            findPath(res, path, root->right,tsum, sum);
-        }
-        path.pop_back();
-        tsum -= root->val;
-    }
-public:
-  vector<vector<int>> pathSum(TreeNode* root, int sum) {
-    vector<vector<int>> res;
-    if (root == nullptr)
-        return res;
 
+        path.push_back(root->val);
+
+        /*
+         *  遇到一个解，保存起来，我们仍然还要继续往下走
+         */
+        if (root->val == sum) {
+            res.push_back(path);
+            std::cout << "( ";
+            for (auto v : path)
+                std::cout << v << ", ";
+            std::cout << ")" << std::endl;
+        }
+
+        findPath(res, path, root->left, sum - root->val);
+        findPath(res, path, root->right, sum - root->val);
+
+        path.pop_back();
+    }
+
+    int findPath2(TreeNode *root, int sum) {
+        if (root == nullptr)
+            return 0;
+
+        /**
+         * 遇到一个解，保存起来，同时继续往下走
+         */
+        int res = 0;
+        if (root->val == sum) {
+            res += 1;
+        }
+        return findPath2(root->left, sum - root->val) +
+        findPath2(root->right, sum - root->val) + res;
+    }
+
+    vector<vector<int>> res;
+
+public:
+  int pathSum(TreeNode* root, int sum) {
+
+    if (root == nullptr)
+        return 0;
+
+#if 1
     vector<int> path;
-    findPath(res, path, root, 0, sum);
-    return res;
+    findPath(res, path, root, sum);
+
+    pathSum(root->left, sum);
+    pathSum(root->right, sum);
+#else
+    int res = findPath2(root, sum);
+    return pathSum(root->left, sum) + pathSum(root->right, sum) + res;
+#endif
+    return 0;
   }
 };
 
 int main()
 {
   /*
- *             5
+ *                  1
  *          /                 \
- *        4                    8
- *       /  \                 /  \
- *      11   null           13   4
- *    7   2  null null     null null null 1
+ *        -2                    -3
+ *       /  \                     /  \
+ *      1       3               -2    null
+ *    -1   null  null null     null null null null
  */
 
   // [5,4,8,11,null,13,4,7,2,null,null,null,1]
   // 22
-  int arr[] = { 5,4,8,11,-1,13,4, 7,2,-1,-1,-1,-1,-1,1};
+  int arr[] = { 1,-2,-3,1,3,-2,-100,-1,-100,-100,-100,-100,-100,-100,-100};
   int n = sizeof(arr)/sizeof(int);
   TreeNode *root = create_tree(arr, n);
   Print(root);
@@ -121,12 +155,7 @@ int main()
 //  std::cout << std::endl;
 
 
-  vector<vector<int>> res = Solution().pathSum(root,22);
-  for (auto &v : res) {
-    for (auto &n : v) {
-      std::cout << n << ", ";
-    }
-    std::cout << std::endl;
-  }
+  int res = Solution().pathSum(root,-1);
+  std::cout << res << std::endl;
   return 0;
 }

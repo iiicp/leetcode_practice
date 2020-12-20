@@ -56,40 +56,17 @@ void Print(TreeNode* p) {
 
 class Solution {
 public:
-  /// 每遍历一个就减去结点的值
-  bool hasPathSum(TreeNode* root, int sum) {
-      if (root == nullptr)
-          return false;
-      if (!root->left && !root->right && root->val == sum)
-          return true;
-      return hasPathSum(root->left, sum-root->val) || hasPathSum(root->right, sum-root->val);
-  }
-
-  bool hasPathSum2(TreeNode *root, int sum) {
-    if (root == nullptr)
-      return false;
-
-    stack<pair<TreeNode*, int>> s;
-    s.push(make_pair(root, sum));
-
-    while (!s.empty()) {
-      TreeNode *node = s.top().first;
-      int num = s.top().second;
-      s.pop();
-
-//      std::cout << "< " << node->val << ", " << num << " >" << std::endl;
-
-      if (node->val == num && !node->left && !node->right)
-        return true;
-
-      if (node->left)
-        s.push(make_pair(node->left, num-node->val));
-      if (node->right)
-        s.push(make_pair(node->right, num-node->val));
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        if (root == nullptr)
+            return root;
+        assert(p && q);
+        if (p->val < root->val && q->val < root->val) {
+            return lowestCommonAncestor(root->left, p, q);
+        }else if (p->val > root->val && q->val > root->val) {
+            return lowestCommonAncestor(root->right, p, q);
+        }
+        return root;
     }
-
-    return false;
-  }
 };
 
 int main()
@@ -99,25 +76,38 @@ int main()
  *          /                 \
  *        4                    8
  *       /  \                 /  \
- *      11   null           13   4
- *    7   2  null null     null null null 1
+ *      2   null           6   9
+ *    1   3  null null     null null null 1
  */
 
   // [5,4,8,11,null,13,4,7,2,null,null,null,1]
   // 22
-  int arr[] = { 5,4,8,11,-1,13,4, 7,2,-1,-1,-1,-1,-1,1};
+  int arr[] = { 5,4,8,2,-1,6,9, 1,3,-1,-1,-1,-1,-1,1};
   int n = sizeof(arr)/sizeof(int);
   TreeNode *root = create_tree(arr, n);
   Print(root);
   std::cout << std::endl;
 
-  int arr1[] = { 0, 1, 2, -1, -1, 3, -1 };
-  int n1 = sizeof(arr1)/sizeof(int);
-  TreeNode *root1 = create_tree(arr1, n1);
-  Print(root1);
-  std::cout << std::endl;
+//  int arr1[] = { 0, 1, 2, -1, -1, 3, -1 };
+//  int n1 = sizeof(arr1)/sizeof(int);
+//  TreeNode *root1 = create_tree(arr1, n1);
+//  Print(root1);
+//  std::cout << std::endl;
 
+  TreeNode *node = Solution().lowestCommonAncestor(root, root->left->left, root->left);
+  if (node) {
+      std::cout << node->val << std::endl;
+  }else {
+      std::cout << "null" << std::endl;
+  }
 
-  std::cout << Solution().hasPathSum(root, 22) << std::endl;
+  std::cout << root->val << ", " << root->left->left->val << ", " << root->right->val << std::endl;
+    node = Solution().lowestCommonAncestor(root, root->left->left, root->right);
+    if (node) {
+        std::cout << node->val << std::endl;
+    }else {
+        std::cout << "null" << std::endl;
+    }
+
   return 0;
 }

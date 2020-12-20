@@ -13,6 +13,7 @@
 #include <queue>
 #include <string>
 #include <unordered_map>
+#include <string>
 
 using namespace std;
 
@@ -55,41 +56,30 @@ void Print(TreeNode* p) {
 }
 
 class Solution {
-public:
-  /// 每遍历一个就减去结点的值
-  bool hasPathSum(TreeNode* root, int sum) {
-      if (root == nullptr)
-          return false;
-      if (!root->left && !root->right && root->val == sum)
-          return true;
-      return hasPathSum(root->left, sum-root->val) || hasPathSum(root->right, sum-root->val);
-  }
-
-  bool hasPathSum2(TreeNode *root, int sum) {
-    if (root == nullptr)
-      return false;
-
-    stack<pair<TreeNode*, int>> s;
-    s.push(make_pair(root, sum));
-
-    while (!s.empty()) {
-      TreeNode *node = s.top().first;
-      int num = s.top().second;
-      s.pop();
-
-//      std::cout << "< " << node->val << ", " << num << " >" << std::endl;
-
-      if (node->val == num && !node->left && !node->right)
-        return true;
-
-      if (node->left)
-        s.push(make_pair(node->left, num-node->val));
-      if (node->right)
-        s.push(make_pair(node->right, num-node->val));
+    void findNumbers(vector<int> &res, int sum, TreeNode *root) {
+        if (root == nullptr)
+            return;
+        int t = sum;
+        sum = sum * 10 + root->val;
+        if (!root->left && !root->right) {
+//            std::cout << sum << std::endl;
+            res.push_back(sum);
+        }else {
+            findNumbers(res, sum, root->left);
+            findNumbers(res, sum, root->right);
+        }
+        sum = t;
     }
-
-    return false;
-  }
+public:
+    int sumNumbers(TreeNode* root) {
+        vector<int> res;
+        findNumbers(res, 0, root);
+        int sum = 0;
+        for (auto &n : res) {
+            sum += n;
+        }
+        return sum;
+    }
 };
 
 int main()
@@ -99,13 +89,13 @@ int main()
  *          /                 \
  *        4                    8
  *       /  \                 /  \
- *      11   null           13   4
+ *      3   null             5   4
  *    7   2  null null     null null null 1
  */
 
   // [5,4,8,11,null,13,4,7,2,null,null,null,1]
   // 22
-  int arr[] = { 5,4,8,11,-1,13,4, 7,2,-1,-1,-1,-1,-1,1};
+  int arr[] = { 5,4,8,3,-1,5,4, 7,2,-1,-1,-1,-1,-1,1};
   int n = sizeof(arr)/sizeof(int);
   TreeNode *root = create_tree(arr, n);
   Print(root);
@@ -118,6 +108,6 @@ int main()
   std::cout << std::endl;
 
 
-  std::cout << Solution().hasPathSum(root, 22) << std::endl;
+  std::cout << Solution().sumNumbers(root) << std::endl;
   return 0;
 }

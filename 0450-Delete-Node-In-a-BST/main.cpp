@@ -54,79 +54,6 @@ void Print(TreeNode* p) {
   Print(p->right);
 }
 
-class Solution2 {
-public:
-  TreeNode *minimumNode(TreeNode *root) {
-    if (root == nullptr)
-      return nullptr;
-    if (root->left == nullptr)
-      return root;
-    return minimumNode(root->left);
-  }
-  TreeNode *maximumNode(TreeNode *root) {
-    if (root == nullptr)
-      return nullptr;
-    if (root->right == nullptr)
-      return root;
-    return maximumNode(root->right);
-  }
-
-  TreeNode *removeMinimumNode(TreeNode *root) {
-    if (root == nullptr)
-      return nullptr;
-    if (root->left == nullptr) {
-      TreeNode *rightNode = root->right;
-      delete root;
-      return rightNode;
-    }
-    root->left = removeMinimumNode(root->left);
-    return root;
-  }
-
-  TreeNode *removeMaximumNode(TreeNode *root) {
-    if (root == nullptr)
-      return nullptr;
-    if (root->right == nullptr) {
-      TreeNode *leftNode = root->left;
-      delete root;
-      return leftNode;
-    }
-    root->right = removeMaximumNode(root->right);
-    return root;
-  }
-public:
-  TreeNode* deleteNode(TreeNode* root, int key) {
-    // find node
-    if (root == nullptr)
-      return NULL;
-
-    if (key < root->val) {
-      root->left = deleteNode(root->left, key);
-      return root;
-    }else if (key > root->val) {
-      root->right = deleteNode(root->right, key);
-      return root;
-    }else {
-      if (root->left == nullptr) {
-        TreeNode *rightNode = root->right;
-        delete root;
-        return rightNode;
-      }
-      if (root->right == nullptr) {
-        TreeNode *leftNode = root->left;
-        delete root;
-        return leftNode;
-      }
-      TreeNode *successor = minimumNode(root->right);
-      TreeNode *backup = new TreeNode(successor->val, successor->left, successor->right);
-      backup->left = root->left;
-      backup->right = removeMinimumNode(root->right);
-      delete root;
-      return backup;
-    }
-  }
-};
-
 class Solution {
   // 寻找最小值时，不需要改变root结点
   TreeNode *minimumNode(TreeNode *root) {
@@ -213,14 +140,14 @@ public:
           return root;
         }else {
           if (root->left == nullptr) {
-            TreeNode *rightNode = root->right;
+            TreeNode *successor = root->right;
             delete root;
-            return rightNode;
+            return successor;
           }
           if (root->right == nullptr) {
-            TreeNode *leftNode = root->left;
+            TreeNode *successor = root->left;
             delete root;
-            return leftNode;
+            return successor;
           }
           TreeNode *successor = maximumNode(root->left);
           TreeNode *backup = new TreeNode(successor->val, successor->left, successor->right);

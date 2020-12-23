@@ -14,7 +14,6 @@
 using namespace std;
 
 class Solution {
-    vector<bool> visited;
 
     void dfs(int n, int k, int start, vector<int> &path, vector<vector<int>> &res) {
         if (k == path.size()) {
@@ -24,13 +23,9 @@ class Solution {
 
         // 候选集
         for (int i = start; i <= n; ++i) {
-            if (!visited[i]) {
-                visited[i] = true;
-                path.push_back(i);
-                dfs(n, k, i + 1, path, res);
-                path.pop_back();
-                visited[i] = false;
-            }
+              path.push_back(i);
+              dfs(n, k, i + 1, path, res);
+              path.pop_back();
         }
     }
 
@@ -45,13 +40,9 @@ class Solution {
         // k - path.size()
         // [i, n] -> [i + k - path.size() <= n]
         for (int i = start; i <= n - k + 1 + path.size(); ++i) {
-            if (!visited[i]) {
-                visited[i] = true;
                 path.push_back(i);
-                dfs(n, k, i + 1, path, res);
+                dfs2(n, k, i + 1, path, res);
                 path.pop_back();
-                visited[i] = false;
-            }
         }
     }
 public:
@@ -62,11 +53,8 @@ public:
             return res;
         }
 
-        visited.clear();
-        visited = vector<bool>(n + 1, false);
-
         vector<int> path;
-        dfs(n, k, 1, path, res);
+        dfs2(n, k, 1, path, res);
         return res;
     }
 };

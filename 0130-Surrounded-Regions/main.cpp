@@ -71,6 +71,20 @@ class Solution {
         }
     }
 
+    /**
+     * 从边缘点O进行搜索，将所有连接的边缘点O，置为'$'，剩下的O置为X
+     *
+     * 逆向思维吧
+     */
+    void search(vector<vector<char>>& board, int i, int j) {
+        board[i][j] = '#';
+        for (int k = 0; k < 4; ++k) {
+          int newX = i + direct[k][0];
+          int newY = j + direct[k][1];
+          if (inArea(newX, newY) && board[newX][newY] == 'O')
+            search(board, newX, newY);
+        }
+    }
 public:
   /// 被环绕的O，说明值为O就一定在棋盘上
   /// 这是一个退出的很重要的条件
@@ -95,33 +109,71 @@ public:
           }
       }
   }
+
+  void solve2(vector<vector<char>>& board) {
+    m = board.size();
+    if (m == 0)
+      return;
+    n = board[0].size();
+    for (int i = 0; i < m; ++i) {
+      if (board[i][0] == 'O')
+        search(board, i, 0);
+      if (board[i][n-1] == 'O')
+        search(board, i, n-1);
+    }
+    for (int i = 0; i < n; ++i) {
+      if (board[0][i] == 'O')
+        search(board, 0, i);
+      if (board[m-1][i] == 'O')
+        search(board, m-1, i);
+    }
+
+    // 复盘
+    for (int i = 0; i < m; ++i) {
+      for (int j = 0; j < n; ++j) {
+        if (board[i][j] == '#') {
+          board[i][j] = 'O';
+        }else if (board[i][j] == 'O') {
+          board[i][j] = 'X';
+        }
+      }
+    }
+  }
+
+  void printBoard(vector<vector<char>> &board) {
+    for (int i = 0; i < board.size(); ++i) {
+      for (int j = 0; j < board[0].size(); ++j) {
+        std::cout << board[i][j] << " ";
+      }
+      std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
+  }
+
 };
 
 int main(){
     vector<vector<char>> board = {
             {'X', 'X', 'X', 'X'},
-            {'X', 'O', 'O', 'X'},
+            {'X', 'O', 'O', 'O'},
             {'X', 'O', 'O', 'X'},
             {'X', 'X', 'X', 'X'}
     };
 
-    for (int i = 0; i < board.size(); ++i) {
-        for (int j = 0; j < board[0].size(); ++j) {
-            std::cout << board[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
+   Solution().printBoard(board);
 
     std::cout << std::endl;
 
     Solution().solve(board);
 
-    for (int i = 0; i < board.size(); ++i) {
-        for (int j = 0; j < board[0].size(); ++j) {
-            std::cout << board[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
+  Solution().printBoard(board);
+
+  std::cout << std::endl;
+
+  Solution().solve2(board);
+
+  Solution().printBoard(board);
 
   return 0;
 }

@@ -4,4 +4,4 @@ project(test)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(test main.cpp ../0417-Pacific-Atlantic-Water-Flow/main.cpp)
+add_executable(test main.cpp)

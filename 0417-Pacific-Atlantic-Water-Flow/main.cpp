@@ -15,85 +15,24 @@ using namespace std;
 
 class Solution {
     int m, n;
-
-    bool isMaxLeft(vector<vector<int>>& matrix,int row, int col) {
-        int cur = matrix[row][col];
-        for (int i = 0; i < col; ++i) {
-            if (cur < matrix[row][i])
-                return false;
-            if (cur == matrix[row][i]) {
-                for (int j = i; j < col; ++j) {
-                    if (matrix[row][j] != cur)
-                        return false;
-                }
-            }
-        }
-        return true;
+    vector<vector<bool>> visitPacific;
+    vector<vector<bool>> visitAtlantic;
+    int direc[4][2] = {{-1,0}, {0, 1}, {1, 0}, {0, -1}};
+    bool inAear(int i, int j) {
+      return i >= 0 && i < m && j >= 0 && j < n;
     }
-
-    bool isMaxRight(vector<vector<int>>& matrix, int row, int col) {
-        int cur = matrix[row][col];
-        for (int i = n-1; i > col; --i) {
-            if (cur < matrix[row][i])
-                return false;
-            if (cur == matrix[row][i]) {
-                for (int j = i; j > col; --j) {
-                    if (cur != matrix[row][j])
-                        return false;
-                }
-            }
-        }
-        return true;
+    void search(vector<vector<int>>& matrix, int i, int j, vector<vector<bool>>& visited, int preValue) {
+        visited[i][j] = true;
+        for (int k = 0; k < 4; ++k) {
+          int newX = i + direc[k][0];
+          int newY = j + direc[k][1];
+          if (inAear(newX, newY) && matrix[newX][newY] >= matrix[i][j] && !visited[newX][newY]) {
+            search(matrix, newX, newY, visited, matrix[i][j]);
+          }
+      }
     }
-
-    bool isMaxUp(vector<vector<int>>& matrix,int row, int col) {
-        int cur = matrix[row][col];
-        for (int i = 0; i < row; ++i) {
-            if (cur < matrix[i][col])
-                return false;
-            if (cur == matrix[i][col]) {
-                for (int  j = i; j < row; ++j) {
-                    if (cur != matrix[j][col])
-                        return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    bool isMaxDown(vector<vector<int>>& matrix, int row, int col) {
-        int cur = matrix[row][col];
-        for (int i = m-1; i > row; --i) {
-            if (cur < matrix[i][col])
-                return false;
-
-            if (cur == matrix[i][col]) {
-                for (int j = i; j > row; --j) {
-                    if (matrix[j][col] != cur)
-                        return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    bool isMax(vector<vector<int>>& matrix, int row, int col) {
-        if (isMaxLeft(matrix, row, col) && isMaxDown(matrix,  row, col))
-            return true;
-
-        if (isMaxLeft(matrix, row, col) && isMaxRight(matrix, row, col))
-            return true;
-
-        if (isMaxUp(matrix, row, col) && isMaxRight(matrix,  row, col))
-            return true;
-
-        if (isMaxUp(matrix, row, col) && isMaxDown(matrix,  row, col))
-            return true;
-
-        return false;
-    }
-
 public:
+    /// 从边缘的点去探索
     vector<vector<int>> pacificAtlantic(vector<vector<int>>& matrix) {
         vector<vector<int>> res;
         m = matrix.size();
@@ -101,23 +40,30 @@ public:
             return res;
         n = matrix[0].size();
 
+        visitAtlantic = vector<vector<bool>>(m, vector<bool>(n, false));
+        visitPacific = visitAtlantic;
+
         for (int i = 0; i < m; ++i) {
-            for (int j = 0; j < n; ++j) {
-                if(isMax(matrix, i, j)) {
-                    vector<int> a = {i, j};
-                    res.push_back(a);
-                }
-            }
+          search(matrix, i, 0, visitPacific, INT_MIN);
+          search(matrix, i, n - 1, visitAtlantic,INT_MIN);
         }
+
+        for (int i = 0; i < n; ++i) {
+          search(matrix, 0, i, visitPacific,INT_MIN);
+          search(matrix, m - 1, i, visitAtlantic,INT_MIN);
+        }
+
+        for (int i = 0; i < m; ++i)
+          for (int j = 0; j < n; ++j)
+            if (visitAtlantic[i][j] == true && visitPacific[i][j] == true)
+                res.push_back({i, j});
         return res;
     }
 };
 
 int main() {
     vector<vector<int>> matrix = {
-            {1,2,3},
-            {8,9,4},
-            {7,6,5}
+        {1,2,2,3,5},{3,2,3,4,4},{2,4,5,3,1},{6,7,1,4,5},{5,1,1,2,4}
     };
 
     vector<vector<int>> res = Solution().pacificAtlantic(matrix);

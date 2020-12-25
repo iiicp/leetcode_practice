@@ -71,12 +71,13 @@ class Solution {
   /// 动态规划
   int tryElement3(vector<vector<int>>& triangle) {
     int n = triangle.size();
-    vector<int> memo(n, -1);
+    /// 初始化数组的技巧
+    vector<int> memo(triangle.back());
 
     /// 初始条件，最后一层的值，也即他们所能获得的最小值
-    for (int i = 0; i < n; ++i) {
-      memo[i] = triangle[n-1][i];
-    }
+//    for (int i = 0; i < n; ++i) {
+//      memo[i] = triangle[n-1][i];
+//    }
 
 //    printV(memo, n);
 

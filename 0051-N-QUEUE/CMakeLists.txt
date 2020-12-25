@@ -4,4 +4,4 @@ project(test)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(test main.cpp ../0051-N-QUEUE/main.cpp)
+add_executable(test main.cpp)

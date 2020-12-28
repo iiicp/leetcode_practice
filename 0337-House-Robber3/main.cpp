@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <unordered_map>
 
 using namespace std;
 
@@ -22,46 +23,49 @@ struct TreeNode {
      TreeNode(int x) : val(x), left(NULL), right(NULL) {}
 };
 
-class Solution {
+struct MyPair{
+    TreeNode *node;
+    bool use;
+
+    MyPair(TreeNode* node, bool use) {
+        this->node = node;
+        this->use = use;
+    }
+
+    bool operator==(const MyPair& p) const {
+        return p.node == node && p.use == use;
+    }
+};
+
+class MyPairHash {
 public:
-    int rob(TreeNode* root) {
+    size_t operator()(const MyPair& p) const {
+        return (size_t)p.node;
+    }
+};
+
+
+class Solution {
+    unordered_map<MyPair, bool, MyPairHash> hash;
+    int tryRob(TreeNode *root, int use) {
         if (root == nullptr)
             return 0;
+        MyPair p(root, use);
+        if (hash.find(p) != hash.end())
+            return hash[p];
 
-        /// 先通过层序遍历将数据线性化
-        vector<int> nums;
-        queue<pair<TreeNode *, int>> q;
-        q.push(make_pair(root, 0));
-
-        while (!q.empty()) {
-            TreeNode *node = q.front().first;
-            int level = q.front().second;
-            q.pop();
-            if (nums.size() == level) {
-                nums.push_back(0);
-            }
-
-            nums[level] += node->val;
-
-            if (node->left) {
-                q.push(make_pair(node->left, level + 1));
-            }
-            if (node->right) {
-                q.push(make_pair(node->right, level + 1));
-            }
+        int res = tryRob(root->left, true) + tryRob(root->right, true);
+        if (use) {
+            res += root->val + tryRob(root->left, false) + tryRob(root->right, false);
         }
 
-        /// 动态规划思路
-        /// 状态定义：考虑[0, index]区间
-        int dp_n_2 = 0;
-        int dp_n_1 = nums[0];
-        int cur = nums[0];
-        for (int i = 1; i < nums.size(); ++i) {
-            cur = std::max(dp_n_1, nums[i] + dp_n_2);
-            dp_n_2 = dp_n_1;
-            dp_n_1 = cur;
-        }
-        return cur;
+        hash[p] = res;
+        return res;
+    }
+
+public:
+    int rob(TreeNode* root) {
+        return tryRob(root, true);
     }
 };
 

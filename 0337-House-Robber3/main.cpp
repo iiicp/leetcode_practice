@@ -44,7 +44,12 @@ public:
     }
 };
 
+/// 实现自定义类的hash
+/// 需要实现两个函数
+/// bool operator==(const MyPair& p) const;
+/// size_t operator()(const MyPair& p) const;
 
+/// 注意除了类名外，其它一个不能错
 class Solution {
     unordered_map<MyPair, bool, MyPairHash> hash;
     int tryRob(TreeNode *root, int use) {
